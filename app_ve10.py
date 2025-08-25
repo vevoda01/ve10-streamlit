@@ -3,7 +3,7 @@
 # ------------------------------------------------------------
 # VE.10 — Load Profile Analyzer (PEA)
 # Streamlit Web UI for analyzing electronic meter load profiles.
-# Author: ChatGPT (prepared for PEA Change Management Office)
+# Author: PEA Change Management Office
 # ------------------------------------------------------------
 
 import io
@@ -29,24 +29,43 @@ st.set_page_config(
 # Helpers
 # -----------------------------
 DEFAULT_COLMAP = {
-    "datetime": "Meter_datetime",
-    "status": "Load_profile_Status",
-    "voltage": "Average_voltage",
-    "p_import": "Average_active_power_import",
-    "p_export": "Average_active_power_export",
+    "datetime": "CH1",
+    "status": "CH2",
+    "voltage": "CH3",
+    "p_import": "CH4",
+    "p_export": "CH5",
 }
 
 def load_dataframe(uploaded, csv_sep=",", excel_sheet=None, excel_skiprows=None):
     if uploaded is None:
         return None
+
+    import os
     name = uploaded.name.lower()
-    if name.endswith((".xls", ".xlsx")):
+    ext = os.path.splitext(name)[-1]
+
+    # Excel
+    if ext in [".xls", ".xlsx"]:
         kw = {}
-        if excel_sheet not in (None, "", "auto"): kw["sheet_name"] = excel_sheet
-        if isinstance(excel_skiprows, int) and excel_skiprows > 0: kw["skiprows"] = excel_skiprows
-        df = pd.read_excel(uploaded, **kw)
-    else:
+        if excel_sheet not in (None, "", "auto"):
+            kw["sheet_name"] = excel_sheet
+        if isinstance(excel_skiprows, int) and excel_skiprows > 0:
+            kw["skiprows"] = excel_skiprows
+
+        if ext == ".xls":
+            # Excel รุ่นเก่า ต้องใช้ xlrd
+            df = pd.read_excel(uploaded, engine="xlrd", **kw)
+        else:
+            # Excel รุ่นใหม่ (xlsx)
+            df = pd.read_excel(uploaded, engine="openpyxl", **kw)
+
+    # CSV
+    elif ext == ".csv":
         df = pd.read_csv(uploaded, sep=csv_sep)
+
+    else:
+        raise ValueError(f"ไม่รองรับไฟล์นามสกุล {ext}")
+
     return df
 
 def clean_unit_series(s):
@@ -118,7 +137,7 @@ with st.sidebar.expander("ข้อมูลนำเข้า (Input)", expande
     excel_skiprows = st.number_input("Excel skiprows (เผื่อหัวตารางพิเศษ)", min_value=0, value=0, step=1)
 
 with st.sidebar.expander("คอลัมน์และรูปแบบเวลา", expanded=True):
-    st.caption("ตั้งค่าคอลัมน์ให้ตรงกับไฟล์สนามจริงของ กฟภ.")
+    st.caption("ตั้งค่าคอลัมน์ให้ตรงกับไฟล์จริงของ load meter")
     col_datetime = st.text_input("คอลัมน์เวลา", value=DEFAULT_COLMAP["datetime"])
     col_status = st.text_input("คอลัมน์สถานะ", value=DEFAULT_COLMAP["status"])
     col_voltage = st.text_input("คอลัมน์แรงดัน (V)", value=DEFAULT_COLMAP["voltage"])
@@ -145,7 +164,7 @@ st.title("เครื่องมือวิเคราะห์ Load Profile
 st.markdown(
     """
 **เป้าหมาย:** ยกระดับขีดความสามารถทีมตรวจสอบหน่วย/มิเตอร์, ใช้ข้อมูลมิเตอร์ตรวจสอบความผิดปกติ/ตอบร้องเรียน, ลดเวลาวิเคราะห์ และเพิ่มความน่าเชื่อถือ  
-**หน่วยงาน:** กองบริหารโครงการและจัดการการเปลี่ยนแปลง (ผู้สนับสนุน: กมต)
+**หน่วยงาน:** กองบริหารโครงการและการจัดการการเปลี่ยนแปลง (ผู้สนับสนุน: กมต)
 """
 )
 
