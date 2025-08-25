@@ -141,7 +141,7 @@ with st.sidebar.expander("คอลัมน์และรูปแบบเว
     col_datetime = st.text_input("คอลัมน์เวลา", value=DEFAULT_COLMAP["datetime"])
     col_status = st.text_input("คอลัมน์สถานะ", value=DEFAULT_COLMAP["status"])
     col_voltage = st.text_input("คอลัมน์แรงดัน (V)", value=DEFAULT_COLMAP["voltage"])
-    col_pimp = st.text_input("คอลัมน์กำลังใช้นำเข้า (kW)", value=DEFAULT_COLMAP["p_import"])
+    col_pimp = st.text_input("คอลัมน์กำลังไฟนำเข้า (kW)", value=DEFAULT_COLMAP["p_import"])
     col_pexp = st.text_input("คอลัมน์กำลังจ่ายย้อน (kW)", value=DEFAULT_COLMAP["p_export"])
     date_fmt = st.text_input("รูปแบบวันที่เวลา (เช่น %d-%m-%Y %H:%M:%S)", value="%d-%m-%Y %H:%M:%S")
 
@@ -280,7 +280,7 @@ with tab_timeseries:
         with c1:
             st.plotly_chart(px.line(df.reset_index(), x=df.index, y=v_col, title="แรงดันไฟฟ้า (V)"), use_container_width=True)
         with c2:
-            st.plotly_chart(px.line(df.reset_index(), x=df.index, y=p_col, title="กำลังใช้นำเข้า (kW)"), use_container_width=True)
+            st.plotly_chart(px.line(df.reset_index(), x=df.index, y=p_col, title="กำลังไฟนำเข้า (kW)"), use_container_width=True)
 
         with st.expander("การกระจายค่า (Distribution)"):
             c3, c4 = st.columns(2)
@@ -314,7 +314,7 @@ with tab_anomaly:
         # Overlay markers on power chart
         mark_df = df.join(flags)
         mark_df = mark_df.reset_index().rename(columns={mark_df.index.name: "ts"})
-        fig = px.line(mark_df, x="ts", y=p_col, title="กำลังใช้นำเข้า (kW) + markers")
+        fig = px.line(mark_df, x="ts", y=p_col, title="กำลังไฟนำเข้า (kW) + markers")
         if "sag" in mark_df:
             fig.add_scatter(x=mark_df.loc[mark_df["sag"], "ts"],
                             y=mark_df.loc[mark_df["sag"], p_col],
