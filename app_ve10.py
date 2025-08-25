@@ -49,7 +49,7 @@ def load_dataframe(uploaded, csv_sep=",", excel_sheet=None, excel_skiprows=None)
         kw = {}
         if excel_sheet not in (None, "", "auto"):
             kw["sheet_name"] = excel_sheet
-        if isinstance(excel_skiprows, int) and excel_skiprows > 0:
+        if isinstance(excel_skiprows, int) and excel_skiprows > 7:
             kw["skiprows"] = excel_skiprows
 
         if ext == ".xls":
