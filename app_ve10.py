@@ -49,7 +49,7 @@ def load_dataframe(uploaded, csv_sep=",", excel_sheet=None, excel_skiprows=None)
         kw = {}
         if excel_sheet not in (None, "", "auto"):
             kw["sheet_name"] = excel_sheet
-        if isinstance(excel_skiprows, int) and excel_skiprows > 7:
+        if isinstance(excel_skiprows, int) and excel_skiprows > 0:
             kw["skiprows"] = excel_skiprows
 
         if ext == ".xls":
@@ -134,7 +134,7 @@ with st.sidebar.expander("ข้อมูลนำเข้า (Input)", expande
     filetype_hint = st.caption("รองรับ .xls, .xlsx, .csv")
     csv_sep = st.text_input("CSV Separator", value=",")
     excel_sheet = st.text_input("Excel Sheet name (เว้นว่าง=auto)", value="")
-    excel_skiprows = st.number_input("Excel skiprows (เผื่อหัวตารางพิเศษ)", min_value=0, value=0, step=1)
+    excel_skiprows = st.number_input("Excel skiprows (เผื่อหัวตาราง)", min_value=0, value=7, step=1)
 
 with st.sidebar.expander("คอลัมน์และรูปแบบเวลา", expanded=True):
     st.caption("ตั้งค่าคอลัมน์ให้ตรงกับไฟล์จริงของ load meter")
